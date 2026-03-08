@@ -1,0 +1,60 @@
+# Secrets and environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local logs and runtime state
+*.log
+logs/
+*.lock
+
+# Databases and caches
+*.sqlite
+*.sqlite3
+*.db
+memory/llm_cache.json
+memory/chat_*.json
+memory/experience_db.json
+ddg_results*.json
+
+# Build / packaged artifacts
+build/
+dist/
+release/
+*.exe
+*.msi
+*.pkg
+*.whl
+
+# Temp and generated outputs
+temp/
+output.txt
+projects/**/current_screen.png
+projects/**/screenshots/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
