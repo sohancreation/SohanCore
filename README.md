@@ -2,6 +2,20 @@
 
 SohanCore is a Windows-first AI assistant that combines a Telegram bot, desktop/browser automation, and multi-provider LLM routing.
 
+## Quick Start For Users
+
+If you only want to install and run the app (not build from source):
+
+1. Go to the `release` folder.
+2. Run `SohanCore-Setup.exe`.
+3. Complete setup and open **SohanCore** from Start Menu.
+4. Configure `.env` in the app folder:
+   - `TELEGRAM_BOT_TOKEN`
+   - `ALLOWED_USER_IDS`
+   - At least one provider key (`OPENROUTER_API_KEY` or `OPENAI_API_KEY`) or local Ollama
+5. Start the backend from the UI.
+6. Open Telegram and message your bot.
+
 It includes:
 - A backend runtime service (`main.py`)
 - A desktop control panel (`sohancore_gui.py`)
@@ -30,7 +44,7 @@ It includes:
 
 After building locally, installable artifacts are generated here:
 
-- Installer package: `release\\SohanCore-Setup.exe`
+- Installer package (share this to other Windows users): `release\\SohanCore-Setup.exe`
 - Backend app folder: `dist\\SohanCore\\` (`SohanCore.exe` inside)
 - Desktop UI folder: `dist\\SohanCoreUI\\` (`SohanCoreUI.exe` inside)
 
@@ -40,15 +54,16 @@ If you publish releases on GitHub, upload `release\\SohanCore-Setup.exe` as the 
 
 ### Option 1: Installer (recommended)
 
-1. Run `SohanCore-Setup.exe`.
-2. Complete installation.
-3. Open **SohanCore** from Start Menu (launches UI).
-4. In UI, open/edit `.env` and set:
+1. Locate installer in `release\\SohanCore-Setup.exe`.
+2. Run `SohanCore-Setup.exe`.
+3. Complete installation.
+4. Open **SohanCore** from Start Menu (launches UI).
+5. In UI, open/edit `.env` and set:
    - `TELEGRAM_BOT_TOKEN`
    - `ALLOWED_USER_IDS`
    - At least one provider key (or configure Ollama)
-5. Start the backend from UI controls.
-6. Open Telegram and chat with your bot.
+6. Start the backend from UI controls.
+7. Open Telegram and chat with your bot.
 
 ### Option 2: Portable executables (without installer)
 
