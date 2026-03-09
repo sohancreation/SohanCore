@@ -1,108 +1,92 @@
-# SohanCore
+﻿# SohanCore
 
-SohanCore is a Windows-first personal desktop AI agent that combines a Telegram interface, multi-provider LLM routing, desktop/browser automation, and memory-backed execution loops.
+SohanCore is a Windows-first AI assistant that combines a Telegram bot, desktop/browser automation, and multi-provider LLM routing.
 
-The project includes:
-- A backend agent runtime (`main.py`)
+It includes:
+- A backend runtime service (`main.py`)
 - A desktop control panel (`sohancore_gui.py`)
-- Packaging scripts for standalone `.exe` and installer builds
+- Build scripts for Windows executables and installer packages
 
-## What The Application Does
+## Key Features
 
-SohanCore receives tasks from Telegram, interprets intent, plans execution, applies safety checks, runs actions through executor modules, and logs outcomes for future context.
+- Telegram-based command and chat interface
+- Automation for desktop actions and web tasks
+- Multi-provider LLM support (Ollama, OpenRouter, OpenAI, Gemini)
+- Safety checks before executing sensitive actions
+- Memory and task-learning components for better continuity
 
-Core capabilities include:
-- Telegram bot command and message handling
-- Multi-provider LLM usage (Ollama, OpenRouter, OpenAI, Gemini, Grok, DeepSeek)
-- Desktop and browser interaction pipelines
-- Local memory/cache components for context and learning
-- GUI dashboard for setup, run/stop control, and live logs
+## Project Structure
 
-## Architecture Overview
+- `main.py`: backend runtime entrypoint
+- `sohancore_gui.py`: desktop UI and operational controls
+- `bot_bridge/`: Telegram listener and execution bridge
+- `brain/`: intent parsing, planning, orchestration
+- `executor/`: desktop, browser, file, and code execution tools
+- `memory/`: chat/task memory and embeddings support
+- `safety/`: execution guardrails
+- `installer/`: Inno Setup installer definition
 
-Top-level modules:
-- `main.py`: backend runtime entrypoint and lifecycle management
-- `sohancore_gui.py`: desktop control panel
-- `bot_bridge/`: Telegram listener and bridge
-- `brain/`: orchestration, planning, and agent-level reasoning
-- `executor/`: action execution modules (browser, desktop, file/code utilities)
-- `memory/`: memory store, cache, embeddings, experience learning
-- `safety/`: safety guardrails
-- `utils/`: shared infrastructure (logging, LLM client, analyzers)
-- `installer/` + `build*.ps1`: packaging and installer automation
+## Installable Software Locations
 
-## Requirements
+After building locally, installable artifacts are generated here:
+
+- Installer package: `release\\SohanCore-Setup.exe`
+- Backend app folder: `dist\\SohanCore\\` (`SohanCore.exe` inside)
+- Desktop UI folder: `dist\\SohanCoreUI\\` (`SohanCoreUI.exe` inside)
+
+If you publish releases on GitHub, upload `release\\SohanCore-Setup.exe` as the main installer asset.
+
+## How To Use (End Users)
+
+### Option 1: Installer (recommended)
+
+1. Run `SohanCore-Setup.exe`.
+2. Complete installation.
+3. Open **SohanCore** from Start Menu (launches UI).
+4. In UI, open/edit `.env` and set:
+   - `TELEGRAM_BOT_TOKEN`
+   - `ALLOWED_USER_IDS`
+   - At least one provider key (or configure Ollama)
+5. Start the backend from UI controls.
+6. Open Telegram and chat with your bot.
+
+### Option 2: Portable executables (without installer)
+
+1. Use `dist\\SohanCoreUI\\SohanCoreUI.exe` to open the UI.
+2. Use `dist\\SohanCore\\SohanCore.exe` to run backend manually (if needed).
+3. Keep `.env` in the project root with valid configuration.
+
+## Developer Setup
+
+### Requirements
 
 - Windows 10/11
 - Python 3.11 or 3.12 recommended
-- Telegram account (for bot integration)
-- At least one LLM provider configured (or local Ollama)
+- Telegram account and bot token
+- At least one LLM provider key or local Ollama
 
-Optional but commonly required for full feature set:
-- Tesseract OCR
+Optional for full feature coverage:
 - Playwright Chromium runtime
+- Tesseract OCR
 
-## Quick Start (Developer)
-
-1. Clone and enter the repo.
-2. Create and activate virtual env:
+### Local Run
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-```
-
-3. Install dependencies:
-
-```powershell
 pip install -r requirements.txt
 playwright install chromium
-```
-
-4. Create config file:
-
-```powershell
 Copy-Item .env.example .env
-```
-
-5. Edit `.env` and set:
-- `TELEGRAM_BOT_TOKEN`
-- `ALLOWED_USER_IDS` (comma-separated Telegram numeric IDs)
-- At least one provider key (`OPENROUTER_API_KEY`, `OPENAI_API_KEY`, etc.) or Ollama settings
-
-6. Run backend:
-
-```powershell
 python main.py
 ```
 
-7. Run GUI (optional, recommended for operations):
+Run UI separately:
 
 ```powershell
 python sohancore_gui.py
 ```
 
-## Secure Configuration Notes
-
-- Never commit `.env` or real API tokens.
-- Rotate tokens immediately if exposed.
-- Restrict `ALLOWED_USER_IDS` to trusted accounts only.
-- Keep `.env.example` as template-only values.
-
-## Running The App
-
-Backend runtime:
-- `python main.py`
-
-GUI control panel:
-- `python sohancore_gui.py`
-
-Helper scripts:
-- `run_sohan_ai.bat`
-- `run_sohancore_gui.bat`
-- `run_sohancore_background.bat`
-
-## Build and Distribution
+## Build Commands
 
 Build backend executable:
 
@@ -110,7 +94,7 @@ Build backend executable:
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-Build GUI executable:
+Build UI executable:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\build_gui.ps1
@@ -122,18 +106,15 @@ Build installer:
 powershell -ExecutionPolicy Bypass -File .\build_installer.ps1
 ```
 
-Primary docs:
-- `PACKAGING_WINDOWS.md`
-- `SHAREABLE_INSTALLER.md`
-
 ## Troubleshooting
 
-- Telegram conflict error: another process is polling the same bot token; stop the other process.
-- No model response: verify provider key/quota or local Ollama availability.
+- Telegram `Conflict` error: another process is already polling the same bot token.
 - Browser automation issues: run `playwright install chromium`.
-- OCR-dependent features failing: verify Tesseract installation and PATH.
+- No model response: verify API key validity, quota, and provider order.
+- OCR issues: verify Tesseract installation and PATH setup.
 
-## Project Status
+## Security Notes
 
-This repository is actively evolving and includes runtime, packaging, and experimental support modules. Use tagged releases for stable distribution snapshots.
-
+- Never commit `.env` or real API keys.
+- Restrict `ALLOWED_USER_IDS` to trusted Telegram IDs.
+- Rotate compromised keys immediately.

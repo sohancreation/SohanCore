@@ -39,10 +39,10 @@ CALLBACK_BUILD_NO = "build_no"
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
     import traceback
     tb = "".join(traceback.format_exception(type(context.error), context.error, context.error.__traceback__))
-    logger.error(f"ðŸš¨ Telegram Error:\n{tb}")
+    logger.error(f"Telegram Error:\n{tb}")
     if update and isinstance(update, Update) and update.effective_message:
         try:
-            await update.effective_message.reply_text(f"âš ï¸ Internal Error: {str(context.error)[:200]}")
+            await update.effective_message.reply_text(f"Internal error: {str(context.error)[:200]}")
         except:
             pass
 
@@ -65,23 +65,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
-        "Hereâ€™s what I can do:\n"
-        "â€¢ Build/modify software projects (multi-file)\n"
-        "â€¢ Research and summarize topics\n"
-        "â€¢ Automate your desktop/browser\n"
-        "â€¢ Run/debug code and fix errors\n\n"
+        "Here is what I can do:\n"
+        "- Build/modify software projects (multi-file)\n"
+        "- Research and summarize topics\n"
+        "- Automate your desktop/browser\n"
+        "- Run/debug code and fix errors\n\n"
         "Commands:\n"
-        "/auto <goal> â€” launch full autonomous mode\n"
-        "/status â€” show if a task is running\n"
-        "/stop â€” cancel the current task\n"
-        "/help â€” this message"
+        "/auto <goal> - launch full autonomous mode\n"
+        "/status - show if a task is running\n"
+        "/stop - cancel the current task\n"
+        "/help - this message"
     )
     await update.message.reply_text(text)
 
 async def status_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     task = context.user_data.get('running_task')
     if task and not task.done():
-        await update.message.reply_text("Iâ€™m working on your task right now. Send /stop to cancel.")
+        await update.message.reply_text("I am working on your task right now. Send /stop to cancel.")
     else:
         await update.message.reply_text("No active tasks. What should we do next?")
 
@@ -89,7 +89,7 @@ async def screen_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.UPLOAD_PHOTO)
     shot = await asyncio.to_thread(capture_screen_state)
     if shot.get("status") != "success":
-        await update.message.reply_text(f"Couldnâ€™t capture screen: {shot.get('message')}")
+        await update.message.reply_text(f"Could not capture screen: {shot.get('message')}")
         return
     path = shot.get("path")
     text = shot.get("text", "").strip() or "(no text detected)"
@@ -106,7 +106,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     voice = update.message.voice
     logger.info(f"Received voice message from {user.id} ({voice.duration}s)")
     
-    await update.message.reply_text("ðŸŽ¤ *Listening...* (Transcribing voice message)", parse_mode='Markdown')
+    await update.message.reply_text("Listening... transcribing voice message.")
     
     try:
                                  
@@ -131,7 +131,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = transcript.text
         logger.info(f"Voice Transcription: {text}")
         
-        await update.message.reply_text(f"ðŸ—£ï¸ *You said:* \"{text}\"", parse_mode='Markdown')
+        await update.message.reply_text(f'You said: "{text}"')
         
                                          
         update.message.text = text
@@ -142,7 +142,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     except Exception as e:
         logger.error(f"Voice transcription error: {e}")
-        await update.message.reply_text(f"âŒ Failed to transcribe voice: {str(e)}")
+        await update.message.reply_text(f"Failed to transcribe voice: {str(e)}")
 
                   
 async def stop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -156,9 +156,9 @@ async def stop_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if task and not task.done():
         task.cancel()
         context.user_data['running_task'] = None
-        await update.message.reply_text("ðŸ›‘ Stopped the running autonomous task.")
+        await update.message.reply_text("Stopped the running autonomous task.")
     else:
-        await update.message.reply_text("â„¹ï¸ No autonomous task is currently running.")
+        await update.message.reply_text("No autonomous task is currently running.")
 
 async def handle_update_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user:
@@ -202,17 +202,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"Cancelling active task for user {user.id}")
             active_task.cancel()
             context.user_data['running_task'] = None
-            await update.message.reply_text("ðŸ›‘ *Emergency Stop Triggered!* Stopping all operations immediately...", parse_mode='Markdown')
+            await update.message.reply_text("Emergency stop triggered. Stopping all operations immediately.")
             return
         else:
-            await update.message.reply_text("â„¹ï¸ No active task is currently running.")
+            await update.message.reply_text("No active task is currently running.")
             return
 
                                                            
     existing_task = context.user_data.get('running_task')
     if existing_task and not existing_task.done():
         if "stop" not in text_lower:
-            await update.message.reply_text("â³ I'm already busy with a goal! Please wait or send 'stop' to cancel it.")
+            await update.message.reply_text("A task is already running. Please wait or send 'stop' to cancel it.")
             return
 
                                      
@@ -236,7 +236,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if context.user_data.get('state') == 'awaiting_build_changes':
         context.user_data['state'] = None
-        await update.message.reply_text(f"ðŸ—ï¸ *Applying changes...*\nProcessing: `{original_text}`", parse_mode='Markdown')
+        await update.message.reply_text(f"Applying changes...\nRequest: {original_text}")
 
                                                             
     history = get_chat_history(user.id, limit=6)
@@ -257,10 +257,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
                                                   
-        plan_summary = f"ðŸ§  *Plan*\nIntent: `{intent.replace('_', ' ').title()}`\n\n"
+        plan_summary = f"*Execution Plan*\nIntent: `{intent.replace('_', ' ').title()}`\n\n"
         for i, step in enumerate(plan, 1):
             if step.get('action') == 'error':
-                plan_summary += f"âŒ {step.get('message')}\n"
+                plan_summary += f"- Error: {step.get('message')}\n"
             else:
                 action_name = step.get('action', '').replace('_', ' ').title()
                 plan_summary += f"{i}. {action_name}\n"
@@ -280,7 +280,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                               
         logger.info("TEST_DEBUG: Starting execute_plan")
         if not is_fast_intent:
-            await update.message.reply_text("ðŸš€ Starting execution...", parse_mode='Markdown')
+            await update.message.reply_text("Starting execution...")
         
                                                     
         exec_task = asyncio.create_task(execute_plan(update, context, plan, intent, original_text))
@@ -291,7 +291,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except asyncio.CancelledError:
             logger.info("Task execution was cancelled by user stop command.")
                                                            
-            try: await msg_handle.reply_text("ðŸ›‘ *Execution Terminated.* All active processes stopped.")
+            try: await msg_handle.reply_text("Execution terminated. All active processes stopped.")
             except: pass
         finally:
             context.user_data['running_task'] = None
@@ -299,7 +299,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"Error in handle_message: {e}", exc_info=True)
         try:
-            await update.message.reply_text(f"âš ï¸ Error: {str(e)}")
+            await update.message.reply_text(f"Error: {str(e)}")
         except Exception:
             pass
 
@@ -307,10 +307,10 @@ async def ask_for_confirmation(update: Update, context: ContextTypes.DEFAULT_TYP
     msg_preview = ""
     for step in plan:
         if step.get('action') == 'send_whatsapp':
-            msg_preview = f"ðŸ“± *WhatsApp to:* `{step.get('phone')}`\n*Message:* {step.get('text')}"
+            msg_preview = f"*WhatsApp to:* `{step.get('phone')}`\n*Message:* {step.get('text')}"
             break
         elif step.get('action') == 'send_email':
-            msg_preview = f"ðŸ“§ *Email to:* `{step.get('to')}`\n*Subject:* {step.get('subject')}\n*Body:* {step.get('body')}"
+            msg_preview = f"*Email to:* `{step.get('to')}`\n*Subject:* {step.get('subject')}\n*Body:* {step.get('body')}"
             break
             
     if len(msg_preview) > 3000:
@@ -318,14 +318,14 @@ async def ask_for_confirmation(update: Update, context: ContextTypes.DEFAULT_TYP
     
     keyboard = [
         [
-            InlineKeyboardButton("âœ… Send Now", callback_data=CALLBACK_SEND),
-            InlineKeyboardButton("âœï¸ Edit Text", callback_data=CALLBACK_EDIT),
+            InlineKeyboardButton("Send Now", callback_data=CALLBACK_SEND),
+            InlineKeyboardButton("Edit Text", callback_data=CALLBACK_EDIT),
         ],
-        [InlineKeyboardButton("âŒ Cancel", callback_data=CALLBACK_CANCEL)]
+        [InlineKeyboardButton("Cancel", callback_data=CALLBACK_CANCEL)]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    confirm_text = f"ðŸ¤– *Personal Assistant Check*\n\nI've drafted the following for you:\n\n{msg_preview}\n\n*Would you like me to send this message, or should we make changes?*"
+    confirm_text = f"*Message Confirmation*\n\nI drafted the following message:\n\n{msg_preview}\n\nWould you like me to send it or edit it?"
     
     if update.callback_query:
         try:
@@ -352,24 +352,24 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if data == CALLBACK_SEND:
-        await query.edit_message_text("ðŸš€ *Executing your request immediately...*", parse_mode='Markdown')
+        await query.edit_message_text("Executing your request now...")
                                   
         exec_task = asyncio.create_task(execute_plan(update, context, pending['plan'], pending['intent'], pending['original_prompt']))
         context.user_data['running_task'] = exec_task
         context.user_data['pending_task'] = None
     elif data == CALLBACK_EDIT:
         context.user_data['state'] = 'awaiting_edit'
-        await query.edit_message_text("ðŸ“ *Understood!* Please type the new message content exactly as you want it sent:")
+        await query.edit_message_text("Please type the new message content exactly as you want it sent.")
     elif data == CALLBACK_CANCEL:
         context.user_data['pending_task'] = None
         context.user_data['state'] = None
-        await query.edit_message_text("ðŸ—‘ï¸ *Cancelled.* I've discarded the draft. What else can I do for you?")
+        await query.edit_message_text("Cancelled. I discarded the draft.")
     elif data == CALLBACK_BUILD_YES:
         context.user_data['state'] = 'awaiting_build_changes'
-        await query.edit_message_text("ðŸ› ï¸ *Great!* Please describe the changes or improvements you'd like to make to the project:")
+        await query.edit_message_text("Please describe the changes or improvements you want in the project.")
     elif data == CALLBACK_BUILD_NO:
         context.user_data['state'] = None
-        await query.edit_message_text("ðŸ *Perfect!* Your project is ready and the live preview is open. Let me know if you need anything else!")
+        await query.edit_message_text("Your project is ready and the live preview is open.")
 
 async def execute_plan(update: Update, context: ContextTypes.DEFAULT_TYPE, plan: list, intent: str, original_text: str):
     msg_handle = update.message if update.message else update.callback_query.message
@@ -381,7 +381,7 @@ async def execute_plan(update: Update, context: ContextTypes.DEFAULT_TYPE, plan:
                                         
         is_safe, safety_msg = validate_task(step)
         if not is_safe:
-            await msg_handle.reply_text(f"ðŸ›¡ï¸ *Safety Guard Blocked this action!*\nReason: {safety_msg}", parse_mode='Markdown')
+            await msg_handle.reply_text(f"Safety guard blocked this action.\nReason: {safety_msg}")
             logger.warning(f"Safety Block on Step {i}: {safety_msg}")
             break
 
@@ -404,7 +404,7 @@ async def execute_plan(update: Update, context: ContextTypes.DEFAULT_TYPE, plan:
             result = await asyncio.to_thread(take_screenshot, step.get("file", "screenshot.png"))
             if result.get("status") == "success":
                 try:
-                    await msg_handle.reply_photo(photo=result.get("path"), caption="ðŸ“¸ Here is your screenshot!")
+                    await msg_handle.reply_photo(photo=result.get("path"), caption="Screenshot captured.")
                 except Exception as e:
                     logger.error(f"Telegram API Error sending photo: {e}")
                     result["message"] += f" (Note: Failed to upload picture to Telegram - {e})"
@@ -433,7 +433,7 @@ async def execute_plan(update: Update, context: ContextTypes.DEFAULT_TYPE, plan:
         elif action == "reply":
             result = {"status": "success", "message": step.get("message")}
             reply_text = step.get("message")
-            await msg_handle.reply_text(f"ðŸ’¬ {reply_text}")
+            await msg_handle.reply_text(f"{reply_text}")
             try:
                 user_id = update.effective_user.id if update.effective_user else None
                 if user_id: add_chat_message(user_id, "assistant", reply_text)
@@ -480,24 +480,24 @@ async def execute_plan(update: Update, context: ContextTypes.DEFAULT_TYPE, plan:
             result = await get_weather(step.get("city", "Dhaka"))
 
                             
-        icon = "âœ…" if result.get("status") == "success" else "âŒ"
+        icon = "[OK]" if result.get("status") == "success" else "[ERROR]"
         human_action = action.replace("_", " ").title()
         msg = f"{icon} {human_action}\n"
         if "message" in result:
             msg += f"{result['message']}\n"
         
         if "results" in result:
-            msg += "\nðŸ”Ž Highlights:\n"
+            msg += "\nHighlights:\n"
             for res in result["results"]:
-                msg += f"â€¢ {res}\n"
+                msg += f"- {res}\n"
         
         if "content" in result:
-            msg += f"\nðŸ“„ Snippet:\n{result['content']}..."
+            msg += f"\nSnippet:\n{result['content']}..."
 
         if "stdout" in result and result["stdout"]:
             msg += f"```\n{result['stdout']}\n```"
         if "stderr" in result and result["stderr"]:
-            msg += f"âš ï¸ Error Output:\n```\n{result['stderr']}\n```"
+            msg += f"Error Output:\n```\n{result['stderr']}\n```"
         
         try:
             await msg_handle.reply_text(msg, parse_mode='Markdown')
@@ -505,22 +505,22 @@ async def execute_plan(update: Update, context: ContextTypes.DEFAULT_TYPE, plan:
             await msg_handle.reply_text(msg.replace("`", "").replace("*", ""))
         
         if result.get("status") == "error":
-            await msg_handle.reply_text("ðŸ›‘ *Execution halted due to error.*", parse_mode='Markdown')
+            await msg_handle.reply_text("Execution halted due to an error.")
             break
     else:
-        await msg_handle.reply_text("âœ¨ *Execution completed successfully!*", parse_mode='Markdown')
+        await msg_handle.reply_text("Execution completed successfully.")
         
                                                          
         if intent in ["software_engineering", "build_software"]:
             from telegram import InlineKeyboardButton, InlineKeyboardMarkup
             keyboard = [
                 [
-                    InlineKeyboardButton("âœ… Yes, make changes", callback_data=CALLBACK_BUILD_YES),
-                    InlineKeyboardButton("âŒ No, I'm done", callback_data=CALLBACK_BUILD_NO)
+                    InlineKeyboardButton("Yes, make changes", callback_data=CALLBACK_BUILD_YES),
+                    InlineKeyboardButton("No, I am done", callback_data=CALLBACK_BUILD_NO)
                 ]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await msg_handle.reply_text("ðŸ—ï¸ *Build complete!* Would you like to change or improve anything?", reply_markup=reply_markup, parse_mode='Markdown')
+            await msg_handle.reply_text("Build complete. Would you like to change or improve anything?", reply_markup=reply_markup)
     
                                          
         if result.get("status") == "success" and intent != "general_request" and len(plan) > 0:

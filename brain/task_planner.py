@@ -19,6 +19,7 @@ def _sync_fallback_plan(parsed_task: dict) -> list[dict]:
 async def fallback_plan(parsed_task: dict) -> list[dict]:
     intent = parsed_task.get('intent', 'unknown')
     params = parsed_task.get('parameters', {})
+    action = params.get("action")
     original_prompt = parsed_task.get('original_prompt', '')
     original_prompt_lower = original_prompt.lower()
     
@@ -29,6 +30,26 @@ async def fallback_plan(parsed_task: dict) -> list[dict]:
                          
     if intent == "agent_execution":
         return [{"action": "run_agentic_loop", "prompt": original_prompt}]
+
+    # Handle explicit web automation intents first.
+    if intent == "web_automation":
+        if action == "search_google":
+            query = (params.get("query") or "").strip()
+            if not query:
+                query = re.sub(
+                    r"^(?:search|google|find|look up|lookup|info on|for|about|the|web|internet)\s+",
+                    "",
+                    original_prompt,
+                    flags=re.IGNORECASE
+                ).strip()
+            if not query:
+                query = original_prompt
+            query = re.sub(r"^(?:for|about|the|web|google|info|me)\s+", "", query, flags=re.IGNORECASE).strip()
+            return [{"action": "search_google", "query": query}]
+        if action == "open_url":
+            return [{"action": "open_url", "url": params.get("url")}]
+        if action == "get_weather":
+            return [{"action": "get_weather", "city": params.get("city")}]
         
                                       
     if intent == "messaging_action":
@@ -156,9 +177,6 @@ async def fallback_plan(parsed_task: dict) -> list[dict]:
             return [{"action": "search_files", "query": params.get("query")}]
 
                 
-    if action == "get_weather":
-        return [{"action": "get_weather", "city": params.get("city")}]
-
     return []                                      
 
 from memory.memory_manager import get_chat_history, add_chat_message
