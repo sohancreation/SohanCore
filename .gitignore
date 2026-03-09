@@ -58,3 +58,9 @@ projects/**/screenshots/
 *.swp
 Thumbs.db
 .DS_Store
+
+# Allow shipping signed/released installer metadata only
+!release/
+release/*
+!release/SohanCore-Setup.exe
+!release/SHA256SUMS.txt
